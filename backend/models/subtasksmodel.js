@@ -6,10 +6,6 @@ const subtaskSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    stid: {
-        type: String,
-        required: true
-    },
     title: {
         type: String,
         required: true
@@ -29,7 +25,8 @@ const subtaskSchema = new mongoose.Schema({
         type: Date, // Use Date type for expiredate
     },
     tags: {
-        type: [String], // Specify the type of elements in the array
+        type: String,
+        enum: ['Do', 'Decide', 'Delegate', 'Delete']
     }
 }, {
     timestamps: true // Add createdAt and updatedAt fields
