@@ -10,14 +10,14 @@ const subtaskSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    bid: {
-        type: String,
-        required: true,
-        unique: true
-    },
     title: {
         type: String,
         required: true
+    },
+    completed: {
+        type: String,
+        default: "no",
+        enum: ['yes', 'no'],
     },
     description: {
         type: String,

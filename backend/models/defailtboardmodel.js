@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const boardSchema = new mongoose.Schema({
+const defboardSchema = new mongoose.Schema({
     uid: {
         type: String,
         required: true 
@@ -12,7 +12,7 @@ const boardSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true, 
-        unique: true
+        default: "default",
     },
     description: {
         type: String, 
@@ -28,6 +28,6 @@ const boardSchema = new mongoose.Schema({
     }
 });
 
-const Board = mongoose.model('Board', boardSchema);
+const Defaultboard = mongoose.model('Defaultboard', defboardSchema);
 
-module.exports = Board;
+module.exports = Defaultboard;

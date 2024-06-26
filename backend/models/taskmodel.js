@@ -18,6 +18,11 @@ const taskSchema = new mongoose.Schema({
     description: {
         type: String,
     },
+    completed: {
+        type: String,
+        default: "no",
+        enum: ['yes', 'no'],
+    },
     startdate: {
         type: Date, // Use Date type for startdate
     },

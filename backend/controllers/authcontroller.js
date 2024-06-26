@@ -6,6 +6,8 @@ const cryptoRandomString = require('crypto-random-string');
 const Auth = require('../models/otpmodel');
 
 const register = async (req, res) => {
+
+    //setup deeafult board//
     const { name, email, password } = req.body;
     try {
         // Check if user with the same email already exists
@@ -161,5 +163,24 @@ const resetPassword = async (req, res) => {
     }
 };
 
+const profile = async (req, res ) => {
+    const {name, password}= req.body
+    const {_id} = req.params
+    try{
 
-module.exports = { login,register,forgotpassword, verifyOTP , resetPassword};
+        const hashedpassword = await bcrypt.hash(password, 10)
+        await User.findByIdAndUpdate(
+            _id,
+            {
+                name,
+                password: hashedpassword,
+            }
+        )
+
+        return res.status(201).json({message : 'profile updated'})
+    }catch (error) {
+        console.error(error)
+    }
+}
+
+module.exports = { login,register,forgotpassword, verifyOTP , resetPassword, profile };
