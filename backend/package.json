@@ -4,7 +4,7 @@
   "description": "This is the backend for the time management mobile application called timeglide",
   "main": "index.js",
   "scripts": {
-    "test": "nodemon ./index.js"
+    "start": "nodemon ./app.js"
   },
   "author": "Mallawaarachchi U V N",
   "license": "ISC",
