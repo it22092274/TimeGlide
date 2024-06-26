@@ -2,10 +2,6 @@ const mongoose = require('mongoose');
 
 // Define the Task schema
 const taskSchema = new mongoose.Schema({
-    tid: {
-        type: String,
-        required: true
-    },
     bid: {
         type: String,
         required: true,
@@ -29,8 +25,12 @@ const taskSchema = new mongoose.Schema({
     expiredate: {
         type: Date, // Use Date type for expiredate
     },
+    prority: {
+        type: Number, 
+    },
     tags: {
-        type: [String], // Specify the type of elements in the array
+        type: String,
+        enum: ['Do', 'Decide', 'Delegate', 'Delete']
     }
 }, {
     timestamps: true // Add createdAt and updatedAt fields

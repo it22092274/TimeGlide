@@ -2,7 +2,6 @@ const Board = require('../models/boardmodel');
 const Task = require('../models/taskmodel');
 const Subtask = require('../models/subtasksmodel');
 const Reminder = require('../models/remindermodel');
-const EisenhowerTask = require('../models/eisenhowermodel');
 const Defaultboard = require('../models/defaultboardmodel');
 const User = require('../models/usermodel');
 
@@ -85,7 +84,6 @@ const deletes = async (req, res) => {
             const allIds = [...taskIds, ...subtaskIds];
 
             await Reminder.deleteMany({ tid: { $in: allIds } });
-            await EisenhowerTask.deleteMany({ tid: { $in: allIds } });
             await Subtask.deleteMany({ taskId: { $in: taskIds } });
             await Task.deleteMany({ bid: _id });
             await Board.findByIdAndDelete(_id);
