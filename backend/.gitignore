@@ -1,0 +1,74 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Specific modules to ignore within node_modules
+node_modules/module_to_ignore/
+node_modules/another_module_to_ignore/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Bower dependency directory
+bower_components/
+
+# Environment variables
+.env
+
+# IDE and editor specific files
+.vscode/
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Testing files
+/coverage/
+
+# Build directories
+/build/
+/dist/
+/out/
+
+# PM2 Logs
+pids
+logs
+*.pid
+*.seed
+
+# Ignore yarn.lock files if using npm
+yarn.lock
+
+# Ignore public folder if you're building a frontend
+/public/
+
+# Ignore generated doc files
+/docs/
+*.doc
+*.docx
+
+# Ignore miscellaneous
+*.log
+*.cache
+*.tmp
+*.bak
+*.swp
+*.sublime-workspace
+*.sublime-project
+
+# Ignore OS files
+Thumbs.db
+.DS_Store
