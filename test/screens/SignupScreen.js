@@ -14,7 +14,7 @@ const SignupScreen = ({ navigation }) => {
 
   const handleSignup = async (values) => {
     try {
-      const response = await axios.post('http://192.168.43.60:3000/register', values);
+      const response = await axios.post('http://172.28.3.238:3000/api/auth/register', values);
       if (response.data.token) {
         // Store the token using AsyncStorage
         await AsyncStorage.setItem('token', response.data.token);

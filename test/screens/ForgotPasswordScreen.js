@@ -20,10 +20,10 @@ const ForgotPasswordScreen = ({ navigation }) => {
   const handleForgotPassword = async (values) => {
     try {
       const response = await axios.post(
-        "http://192.168.43.60:3000/forgot-password",
+        "http://172.28.3.238:3000/api/auth/forgot-password",
         values
       );
-      if (response.data.success) {
+      if (response.status == 200) {
         navigation.navigate("OTPScreen", { email: values.email });
       }
     } catch (error) {
@@ -68,7 +68,6 @@ const ForgotPasswordScreen = ({ navigation }) => {
           </View>
         )}
       </Formik>
-      <Text style={styles.forgotPassword} onPress={() => navigation.navigate('OTPScreen', { email: "values.email" })} >Forgot password?</Text>
     </ScrollView>
   );
 };

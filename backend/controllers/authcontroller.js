@@ -1,8 +1,8 @@
 const User = require('../models/usermodel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const { transporter } = require('../service/emailservice');
-const cryptoRandomString = require('crypto-random-string');
+//const { transporter } = require('../service/emailservice');
+//const {cryptoRandomString} = require('crypto-random-string');
 const Auth = require('../models/otpmodel');
 
 const register = async (req, res) => {
@@ -76,9 +76,24 @@ const login = async (req, res) => {
 };
 
 
+const nodemailer = require('nodemailer')
+
+const transporter =  nodemailer.createTransport({
+    host: 'smtp-relay.brevo.com',
+    port: 587,
+    secure: false,
+    auth: {
+        user:'vihanganethusara00@gmail.com',
+        pass: 'AVxbHhRFvjTPG8Eg'
+    }
+})
+
 const forgotpassword = async (req, res) => {
     const { email } = req.body;
     try {
+        // Dynamically import 'crypto-random-string'
+        const cryptoRandomString = (await import('crypto-random-string')).default;
+
         // Generate OTP
         const otp = cryptoRandomString({ length: 6, type: 'numeric' });
 
@@ -91,7 +106,7 @@ const forgotpassword = async (req, res) => {
 
         // Send OTP via email
         await transporter.sendMail({
-            from: 'vihanganethusara00@gmail.com',
+            from: 'dev.timeglide@gmail.com',
             to: email,
             subject: 'Password Reset OTP',
             text: `Your OTP for password reset is: ${otp}`,
@@ -100,7 +115,6 @@ const forgotpassword = async (req, res) => {
 
         // Return success response to frontend
         return res.status(200).json({ message: 'OTP sent successfully.' });
-
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Server Error' });
@@ -113,7 +127,8 @@ const verifyOTP = async (req, res) => {
     try {
         // Find the latest OTP record for the given email
         const auth = await Auth.findOne({ email }).sort({ createdAt: -1 });
-
+        console.log(auth, email, otp)
+        // Check if OTP record exists
         if (!auth) {
             return res.status(401).json({ message: "OTP expired or invalid" });
         }
@@ -122,6 +137,9 @@ const verifyOTP = async (req, res) => {
         const isVerified = (otp === auth.otp);
 
         if (isVerified) {
+            // Optionally delete the OTP record after successful verification
+            await Auth.deleteOne({ _id: auth._id });
+
             return res.status(200).json({ message: "OTP verified successfully" });
         } else {
             return res.status(401).json({ message: "OTP expired or invalid" });

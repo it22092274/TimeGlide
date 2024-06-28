@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, TextInput, StyleSheet, Text, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
@@ -11,9 +11,24 @@ const LoginScreen = ({ navigation }) => {
     password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
   });
 
+  useEffect(() => {
+    const checkToken = async () => {
+      try {
+        const token = await AsyncStorage.getItem('token');
+        if (token) {
+          navigation.navigate('Homes');
+        }
+      } catch (error) {
+        console.error('Error checking token', error);
+      }
+    };
+
+    checkToken();
+  }, [navigation]);
+
   const handleLogin = async (values) => {
     try {
-      const response = await axios.post('http://192.168.43.60:3000/login', values);
+      const response = await axios.post('http://172.28.3.238:3000/api/auth/login', values);
       if (response.data.token) {
         // Store the token using AsyncStorage
         await AsyncStorage.setItem('token', response.data.token);
@@ -66,7 +81,9 @@ const LoginScreen = ({ navigation }) => {
       <Text style={styles.link} onPress={() => navigation.navigate('Signup')}>
         Don't have an account? Register
       </Text>
-      <Text style={styles.forgotPassword} onPress={() => navigation.navigate('ForgotPassword')} >Forgot password?</Text>
+      <Text style={styles.forgotPassword} onPress={() => navigation.navigate('ForgotPassword')}>
+        Forgot password?
+      </Text>
     </ScrollView>
   );
 };

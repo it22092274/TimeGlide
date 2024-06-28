@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, TextInput, Button, StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, TextInput, StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
@@ -7,14 +7,29 @@ import axios from 'axios';
 const OTPScreen = ({ route, navigation }) => {
   const { email } = route.params;
 
+  const [timer, setTimer] = useState(60);
+  const [isResendDisabled, setIsResendDisabled] = useState(true);
+
+  useEffect(() => {
+    let interval;
+    if (timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prevTimer) => prevTimer - 1);
+      }, 1000);
+    } else {
+      setIsResendDisabled(false);
+    }
+    return () => clearInterval(interval);
+  }, [timer]);
+
   const validationSchema = Yup.object().shape({
     otp: Yup.string().length(6, 'OTP must be 6 digits').required('OTP is required'),
   });
 
   const handleVerifyOTP = async (values) => {
     try {
-      const response = await axios.post('http://192.168.43.60:3000/verify-otp', { email, otp: values.otp });
-      if (response.data.success) {
+      const response = await axios.post('http://172.28.3.238:3000/api/auth/otp', { email, otp: values.otp });
+      if (response.status === 200) {
         navigation.navigate('ResetPassword', { email });
       }
     } catch (error) {
@@ -22,9 +37,19 @@ const OTPScreen = ({ route, navigation }) => {
     }
   };
 
+  const handleResendOTP = async () => {
+    try {
+      await axios.post('http://172.28.3.238:3000/api/auth/forgot-password', { email });
+      setTimer(60);
+      setIsResendDisabled(true);
+    } catch (error) {
+      console.error('Resend OTP error', error);
+    }
+  };
+
   return (
     <View style={styles.container}>
-              <Image source={require('../assets/otp.png')} style={styles.image} />
+      <Image source={require('../assets/otp.png')} style={styles.image} />
       <Text style={styles.welcomeText}>Enter OTP</Text>
       <Formik
         initialValues={{ otp: '' }}
@@ -47,10 +72,16 @@ const OTPScreen = ({ route, navigation }) => {
             <TouchableOpacity style={styles.button} onPress={handleSubmit}>
               <Text style={styles.buttonText}>Verify OTP</Text>
             </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.resendButton, isResendDisabled ? styles.buttonDisabled : styles.buttonEnabled]}
+              onPress={handleResendOTP}
+              disabled={isResendDisabled}
+            >
+              <Text style={[styles.resendButtonText, isResendDisabled ? styles.resendButtonText : styles.buttonEnabled]}>Resend OTP ({timer})</Text>
+            </TouchableOpacity>
           </View>
         )}
       </Formik>
-      <Text style={styles.forgotPassword} onPress={() => navigation.navigate('ResetPassword', { email: "values.email" })} >Forgot password?</Text>
     </View>
   );
 };
@@ -102,10 +133,34 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 10,
   },
+  resendButton: {
+    height: 50,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    marginTop: 10,
+  },
   buttonText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  resendButtonText: {
+    color: '#1f1f1f',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  buttonDisabled: {
+    backgroundColor: '#fff',
+  },
+  buttonEnabled: {
+    color: '#F5A623',
+  },
+  forgotPassword: {
+    color: 'gray',
+    marginTop: 20,
+    textAlign: 'center',
   },
 });
 

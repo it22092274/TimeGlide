@@ -16,11 +16,11 @@ const ResetPasswordScreen = ({ route, navigation }) => {
 
   const handleResetPassword = async (values) => {
     try {
-      const response = await axios.post('http://192.168.43.60:3000/reset-password', {
+      const response = await axios.post('http://172.28.3.238:3000/api/auth/reset-password', {
         email,
         password: values.password,
       });
-      if (response.data.success) {
+      if (response.status == 200) {
         navigation.navigate('Login');
       }
     } catch (error) {
