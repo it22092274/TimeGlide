@@ -28,7 +28,7 @@ const OTPScreen = ({ route, navigation }) => {
 
   const handleVerifyOTP = async (values) => {
     try {
-      const response = await axios.post('http://172.28.3.238:3000/api/auth/otp', { email, otp: values.otp });
+      const response = await axios.post('http://192.168.43.60:3000/api/auth/otp', { email, otp: values.otp });
       if (response.status === 200) {
         navigation.navigate('ResetPassword', { email });
       }
@@ -39,7 +39,7 @@ const OTPScreen = ({ route, navigation }) => {
 
   const handleResendOTP = async () => {
     try {
-      await axios.post('http://172.28.3.238:3000/api/auth/forgot-password', { email });
+      await axios.post('http://192.168.43.60:3000/api/auth/forgot-password', { email });
       setTimer(60);
       setIsResendDisabled(true);
     } catch (error) {

@@ -1,11 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { View, TextInput, StyleSheet, Text, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import UserContext from '../UserContext';
+import decodeToken from '../utils/jwtDecoder';
+
 
 const LoginScreen = ({ navigation }) => {
+
+  const { setUserData } = useContext(UserContext)
+
   const validationSchema = Yup.object().shape({
     email: Yup.string().email('Invalid email').required('Email is required'),
     password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
@@ -15,8 +21,16 @@ const LoginScreen = ({ navigation }) => {
     const checkToken = async () => {
       try {
         const token = await AsyncStorage.getItem('token');
+        console.log(token)
         if (token) {
-          navigation.navigate('Homes');
+          const decodedToken = decodeToken(token)
+          if( decodedToken ){
+            setUserData({ email: decodedToken.email, _id: decodedToken._id})
+            navigation.navigate('Homes');
+          }
+          else{
+            console.error('Invalid Token Format');
+          }
         }
       } catch (error) {
         console.error('Error checking token', error);
@@ -24,15 +38,21 @@ const LoginScreen = ({ navigation }) => {
     };
 
     checkToken();
-  }, [navigation]);
+  }, [navigation, setUserData]);
 
   const handleLogin = async (values) => {
     try {
-      const response = await axios.post('http://172.28.3.238:3000/api/auth/login', values);
+      const response = await axios.post('http://192.168.43.60:3000/api/auth/login', values);
       if (response.data.token) {
         // Store the token using AsyncStorage
         await AsyncStorage.setItem('token', response.data.token);
-        navigation.navigate('Home');
+        const decodedToken = decodeToken(response.data.token);
+        if (decodedToken) {
+          setUserData({ email: decodedToken.email, id: decodedToken._id });
+          navigation.navigate('Homes');
+        } else {
+          console.error('Invalid token format');
+        }
       }
     } catch (error) {
       console.error('Login error', error);

@@ -20,7 +20,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
   const handleForgotPassword = async (values) => {
     try {
       const response = await axios.post(
-        "http://172.28.3.238:3000/api/auth/forgot-password",
+        "http://192.168.43.60:3000/api/auth/forgot-password",
         values
       );
       if (response.status == 200) {

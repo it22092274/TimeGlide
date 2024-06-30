@@ -18,6 +18,7 @@ const DrawerContent = (props) => {
         label="Profile"
         onPress={() => props.navigation.navigate('Profile')}
       />
+      
       {/* Add more DrawerItems for other screens */}
     </DrawerContentScrollView>
   );

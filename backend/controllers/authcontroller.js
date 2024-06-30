@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 //const { transporter } = require('../service/emailservice');
 //const {cryptoRandomString} = require('crypto-random-string');
 const Auth = require('../models/otpmodel');
+const path = require('path');
 
 const register = async (req, res) => {
 
@@ -76,7 +77,8 @@ const login = async (req, res) => {
 };
 
 
-const nodemailer = require('nodemailer')
+const nodemailer = require('nodemailer');
+const multer = require('multer');
 
 const transporter =  nodemailer.createTransport({
     host: 'smtp-relay.brevo.com',
@@ -181,24 +183,76 @@ const resetPassword = async (req, res) => {
     }
 };
 
+
+// Configure Multer for file uploads
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, 'uploads/');
+    },
+    filename: (req, file, cb) => {
+      cb(null, `${Date.now()}-${file.originalname}`);
+    },
+  });
+  
+  const upload = multer({ storage: storage });
+
+  const profileUpdate = async (req, res) => {
+    const { name, bio, phone, address, age, password } = req.body;
+    const { id } = req.params;
+  
+    try {
+      let updateFields = { name, bio, phone, address, age };
+  
+      if (password) {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        updateFields.password = hashedPassword;
+      }
+  
+      if (req.file) {
+        updateFields.profilePicture = `http://192.168.43.60:3000/uploads/${req.file.filename}`;
+      }
+  
+      const updatedUser = await User.findByIdAndUpdate(id, updateFields, { new: true });
+  
+      return res.status(200).json({ message: 'Profile updated successfully', data: updatedUser });
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+  };
+  
+
 const profile = async (req, res ) => {
-    const {name, password}= req.body
-    const {_id} = req.params
+    const {email}= req.body
     try{
 
-        const hashedpassword = await bcrypt.hash(password, 10)
-        await User.findByIdAndUpdate(
-            _id,
-            {
-                name,
-                password: hashedpassword,
-            }
-        )
-
-        return res.status(201).json({message : 'profile updated'})
+        const user = await User.findOne({email})
+        console.log(user)
+        
+        return res.status(201).json({data : user})
     }catch (error) {
         console.error(error)
     }
 }
 
-module.exports = { login,register,forgotpassword, verifyOTP , resetPassword, profile };
+const signout = async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        // Validate req.body.email if needed
+
+        const user = await User.findOneAndDelete({ email });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        return res.status(200).json({ message: 'Signout successful' });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error' });
+    }
+};
+
+
+module.exports = { login,register,forgotpassword,upload, signout , verifyOTP , resetPassword, profile,profileUpdate  };

@@ -1,4 +1,4 @@
-
+//app.js
 const express = require('express');
 const cors = require('cors'); 
 const bodyParser = require('body-parser');
@@ -6,6 +6,8 @@ const morganMiddleware = require('./middleware/logger');
 
 
 const app = express()
+
+app.use('/uploads', express.static('uploads'));
 
 app.use(morganMiddleware);
 
