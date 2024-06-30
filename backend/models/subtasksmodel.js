@@ -33,7 +33,7 @@ const subtaskSchema = new mongoose.Schema({
 });
 
 // Create the Task model using the schema
-const Subtask = mongoose.model('Task', subtaskSchema);
+const Subtask = mongoose.model('Subtasks', subtaskSchema);
 
 // Export the Task model for use in other parts of the application
 module.exports = Subtask;

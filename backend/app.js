@@ -16,8 +16,10 @@ app.use(bodyParser.json());
 app.use(cors());
 
 const AuthRouter = require('./routes/authroute')
+const boardRouter =  require('./routes/boardroute')
 
 app.use('/api', AuthRouter)
+app.use('/api', boardRouter)
 
 require('./config/db');
 const PORT = process.env.PORT || 3000;

@@ -23,7 +23,7 @@ const CustomDrawerContent = ({ navigation }) => {
             style={styles.logo}
             resizeMode="contain"
           />
-          <Text style={styles.appName}>Your App Name</Text>
+          <Text style={styles.appName}>Time Glide</Text>
         </View>
 
         {/* Drawer Items */}

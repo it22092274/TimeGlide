@@ -1,7 +1,7 @@
 const Board = require('../models/boardmodel');
 const Task = require('../models/taskmodel');
 const Subtask = require('../models/subtasksmodel');
-const Reminder = require('../models/remindermodel');
+const Reminder = require('../models/reminder');
 const Defaultboard = require('../models/defaultboardmodel');
 const User = require('../models/usermodel');
 
@@ -11,7 +11,7 @@ const create = async (req, res) => {
     try {
         const existingBoard = await Board.findOne({ uid, name });
         if (existingBoard) {
-            return res.status(401).json({ message: "Board already exists" });
+            return res.status(400).json({ message: "Board already exists" });
         }
 
         const newBoard = new Board({
@@ -48,7 +48,7 @@ const edit = async (req, res) => {
     const { _id } = req.params;
 
     try {
-        await Board.findByIdAndUpdate(
+        const board = await Board.findByIdAndUpdate(
             _id,
             {
                 themeid,
@@ -56,10 +56,15 @@ const edit = async (req, res) => {
                 description,
                 expiredate,
                 displaycolor
-            }
+            },
+            { new: true } // Return updated board
         );
 
-        return res.status(200).json({ message: "Update successful" });
+        if (!board) {
+            return res.status(404).json({ message: "Board not found" });
+        }
+
+        return res.status(200).json({ message: "Update successful", data: board });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Server Error' });
@@ -76,7 +81,7 @@ const deletes = async (req, res) => {
         if (completed) {
             const subtaskIds = [];
             for (const task of tasks) {
-                const subtasks = await Subtask.find({ tasksId: task._id });
+                const subtasks = await Subtask.find({ taskId: task._id });
                 subtasks.forEach(subtask => subtaskIds.push(subtask._id));
             }
 
@@ -88,9 +93,9 @@ const deletes = async (req, res) => {
             await Task.deleteMany({ bid: _id });
             await Board.findByIdAndDelete(_id);
 
-            return res.status(201).json({ message: "Board and all associated tasks deleted successfully" });
+            return res.status(200).json({ message: "Board and all associated tasks deleted successfully" });
         } else {
-            const defaultBoard = await Defaultboard.findOne({ uid: uid });
+            const defaultBoard = await Defaultboard.findOne({ uid });
 
             if (!defaultBoard) {
                 return res.status(404).json({ message: "Default board not found" });
@@ -107,7 +112,7 @@ const deletes = async (req, res) => {
 
             await Board.findByIdAndDelete(_id);
 
-            return res.status(201).json({ message: "Board deleted, tasks moved to default board" });
+            return res.status(200).json({ message: "Board deleted, tasks moved to default board" });
         }
     } catch (error) {
         console.error(error);
